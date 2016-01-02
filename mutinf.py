@@ -55,10 +55,10 @@ def create_hd5files_from_xvg(dir,skiprows):
     for i,filename in enumerate(filename_list):
     #creating hdf5 files for those that have not been created before. 
         if not (os.path.exists(filename+'.h5')):
-            h5file=openFile(filename+'.h5',"w",title="time")
-            time_dihedral=h5file.createGroup("/",'time')
+            h5file=open_file(filename+'.h5',"w",title="time")
+            time_dihedral=h5file.create_group("/",'time')
             data=numpy.loadtxt(filename,usecols=(1,),skiprows=skiprows)
-            grid=h5file.createArray('/time','grid',data)
+            grid=h5file.create_array('/time','grid',data)
             h5file.close()
 
 
@@ -83,12 +83,14 @@ def mutual_information_from_files(res_name1, res_id1, res_name2, res_id2, dir, s
     filename_id2 = glob.glob('%s/%s???%d.xvg.h5' %(dir,res_name2,res_id2))
 #    print res_name1, res_name2, res_id1, res_id2, filename_id1, filename_id2
     if  filename_id1 and filename_id2:
-        f = tables.openFile(filename_id1[0])
+        f = tables.open_file(filename_id1[0])
         dihedral_id1 = numpy.array(f.root.time.grid[:])
+        f.close()
         
-        f = tables.openFile(filename_id2[0])
+        f = tables.open_file(filename_id2[0])
         dihedral_id2 = numpy.array(f.root.time.grid[:])
 	mi = python_mi(dihedral_id1, dihedral_id2, bin_n)
+	f.close()
 #        result[ res_name1, res_id1, res_name2, res_id2 ] = mi
     return mi
 
@@ -179,5 +181,5 @@ def parse_commandline():
 
 if __name__ == "__main__":
     (options, args) = parse_commandline()
-    #create_hd5files_from_xvg(options.dir,options.s)
+    create_hd5files_from_xvg(options.dir,options.s)
     main(dir = options.dir, total_n_residues = options.t, skiprows = options.s, bin_n = options.bin_n)
